@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)file:///C:/Users/hatch/Downloads/carsen-index_1.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Carsen">
+<meta name="theme-color" content="#ffffff">
+<title>Carsen's Dashboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f5f5f3; --bg3: #eeede9;
+    --text: #1a1a1a; --text2: #6b6b68; --text3: #9b9b97;
+    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
+    --green: #0f6e56; --green-bg: #e1f5ee;
+    --amber: #854f0b; --amber-bg: #faeeda;
+    --red: #a32d2d; --red-bg: #fcebeb;
+    --blue: #185fa5; --blue-bg: #e6f1fb;
+    --radius: 8px; --radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a; --bg2: #252523; --bg3: #2e2e2b;
+      --text: #f0efe9; --text2: #a8a8a3; --text3: #6b6b68;
+      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
+      --green: #5dcaa5; --green-bg: #04342c;
+      --amber: #ef9f27; --amber-bg: #412402;
+      --red: #f09595; --red-bg: #501313;
+      --blue: #85b7eb; --blue-bg: #042c53;
+    }
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; padding-bottom: 80px; }
+  header { background: var(--bg); border-bottom: 0.5px solid var(--border); padding: 14px 16px 10px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; }
+  header h1 { font-size: 17px; font-weight: 600; }
+  header p { font-size: 12px; color: var(--text2); margin-top: 1px; }
+  .sync-status { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+  .sync-ok { background: var(--green-bg); color: var(--green); }
+  .sync-err { background: var(--red-bg); color: var(--red); }
+  .sync-ing { background: var(--bg2); color: var(--text2); }
+  .page { max-width: 480px; margin: 0 auto; padding: 16px 12px; }
+  nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg); border-top: 0.5px solid var(--border); display: flex; z-index: 10; padding-bottom: env(safe-area-inset-bottom); }
+  nav button { flex: 1; border: none; background: none; cursor: pointer; padding: 10px 4px 8px; color: var(--text3); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  nav button .nav-icon { font-size: 22px; }
+  nav button.active { color: #0f6e56; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 12px; }
+  .section-title { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+  .metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
+  .metric { background: var(--bg2); border-radius: var(--radius); padding: 10px 12px; }
+  .metric-label { font-size: 11px; color: var(--text2); margin-bottom: 2px; }
+  .metric-value { font-size: 20px; font-weight: 600; color: var(--text); }
+  .metric-value.green { color: var(--green); }
+  .metric-value.amber { color: var(--amber); }
+  .metric-value.red { color: var(--red); }
+  .bar-wrap { background: var(--bg2); border-radius: 6px; height: 8px; overflow: hidden; margin: 6px 0 3px; }
+  .bar { height: 8px; border-radius: 6px; transition: width 0.3s; }
+  .bar-green { background: #1D9E75; }
+  .bar-amber { background: #EF9F27; }
+  .bar-red { background: #E24B4A; }
+  .bar-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin-bottom: 12px; }
+  .week-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .week-nav button { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 6px 12px; font-size: 18px; cursor: pointer; color: var(--text); line-height: 1; }
+  .week-label { flex: 1; text-align: center; font-size: 15px; font-weight: 600; }
+  input[type="number"], input[type="text"], input[type="date"] { background: var(--bg2); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 8px 10px; font-size: 14px; color: var(--text); width: 100%; -webkit-appearance: none; }
+  input[type="number"]:focus, input[type="text"]:focus, input[type="date"]:focus { outline: none; border-color: #1D9E75; }
+  input[type="range"] { flex: 1; accent-color: #1D9E75; }
+  select { background: var(--bg2); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 8px 10px; font-size: 13px; color: var(--text); -webkit-appearance: none; width: 100%; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; background: var(--bg2); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 9px 14px; font-size: 14px; color: var(--text); cursor: pointer; white-space: nowrap; }
+  .btn:active { opacity: 0.7; }
+  .btn-primary { background: #0f6e56; border-color: #0f6e56; color: #fff; width: 100%; justify-content: center; font-weight: 600; padding: 12px; font-size: 15px; border-radius: var(--radius-lg); margin-top: 4px; }
+  .btn-primary:active { background: #085041; }
+  .btn-icon { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 16px; padding: 2px 4px; line-height: 1; }
+  .btn-icon:hover { color: var(--red); }
+  .btn-sm { padding: 6px 12px; font-size: 13px; }
+  .input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .input-label { font-size: 13px; color: var(--text2); min-width: 115px; }
+  .cat-header { display: grid; grid-template-columns: 1fr 78px 78px 44px 30px; gap: 6px; font-size: 11px; color: var(--text2); margin-bottom: 8px; padding-bottom: 8px; border-bottom: 0.5px solid var(--border); }
+  .cat-row { display: grid; grid-template-columns: 1fr 78px 78px 44px 30px; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .cat-name { font-size: 13px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .cat-left { font-size: 12px; font-weight: 600; text-align: right; }
+  .cat-left.green { color: var(--green); }
+  .cat-left.amber { color: var(--amber); }
+  .cat-left.red { color: var(--red); }
+  .cat-total-row { display: grid; grid-template-columns: 1fr 78px 78px 44px 30px; gap: 6px; align-items: center; padding-top: 10px; margin-top: 6px; border-top: 0.5px solid var(--border); font-size: 13px; font-weight: 600; }
+  .add-cat-row { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--border); }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+  .badge-oriole { background: var(--blue-bg); color: var(--blue); }
+  .badge-own { background: var(--green-bg); color: var(--green); }
+  .badge-other { background: var(--amber-bg); color: var(--amber); }
+  .alert { border-radius: var(--radius); padding: 9px 12px; font-size: 12px; margin-bottom: 10px; display: none; line-height: 1.4; }
+  .alert.show { display: block; }
+  .alert-floor { background: var(--amber-bg); color: var(--amber); }
+  .alert-cap { background: var(--green-bg); color: var(--green); }
+  .cust-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 10px; overflow: hidden; }
+  .cust-card-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; }
+  .cust-card-header:active { background: var(--bg2); }
+  .cust-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+  .avatar-own { background: var(--green-bg); color: var(--green); }
+  .avatar-oriole { background: var(--blue-bg); color: var(--blue); }
+  .avatar-other { background: var(--amber-bg); color: var(--amber); }
+  .cust-info { flex: 1; }
+  .cust-name { font-size: 14px; font-weight: 600; }
+  .cust-meta { font-size: 12px; color: var(--text2); margin-top: 1px; }
+  .cust-body { display: none; border-top: 0.5px solid var(--border); padding: 12px 14px; }
+  .cust-body.open { display: block; }
+  .job-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
+  .job-row:last-child { border-bottom: none; }
+  .job-date { color: var(--text2); min-width: 60px; font-size: 12px; }
+  .job-note { flex: 1; color: var(--text); }
+  .job-amt { font-weight: 600; color: var(--green); min-width: 50px; text-align: right; }
+  .add-job-form { background: var(--bg2); border-radius: var(--radius); padding: 10px 12px; margin-top: 10px; }
+  .add-job-form .form-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .add-job-form .form-row:last-child { margin-bottom: 0; }
+  .hist-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
+  .hist-row:last-child { border-bottom: none; }
+  .cust-hist-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
+  .cust-hist-row:last-child { border-bottom: none; }
+  .banner { background: var(--bg2); border-left: 3px solid #1D9E75; border-radius: var(--radius-lg); padding: 12px 14px; margin-bottom: 12px; }
+  .slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .slider-row label { font-size: 13px; color: var(--text2); min-width: 80px; }
+  .slider-val { font-size: 13px; font-weight: 600; min-width: 36px; text-align: right; }
+  .hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .empty { font-size: 13px; color: var(--text3); padding: 8px 0; }
+  .divider { height: 0.5px; background: var(--border); margin: 12px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🌿 Carsen's Dashboard</h1>
+    <p>Budget · Earnings · Lawn customers</p>
+  </div>
+  <span class="sync-status sync-err" id="sync-status">✗ Offline</span>
+</header>
+
+<div class="page">
+
+  <!-- BUDGET -->
+  <div id="sec-budget" class="section active">
+    <div class="week-nav">
+      <button onclick="changeWeek(-1)">‹</button>
+      <span class="week-label" id="wl-b">Week of Jun 28</span>
+      <button onclick="changeWeek(1)">›</button>
+    </div>
+    <div class="banner">
+      <div style="font-size:14px;font-weight:600;margin-bottom:2px;">Set your budget first</div>
+      <div style="font-size:12px;color:var(--text2);">Decide where the money goes before you spend it.</div>
+    </div>
+    <div class="card">
+      <div class="section-title">Spending by category</div>
+      <div class="cat-header">
+        <span>Category</span><span style="text-align:right">Budget</span><span style="text-align:right">Spent</span><span style="text-align:right">Left</span><span></span>
+      </div>
+      <div id="cat-rows">
+    <div class="cat-row">
+      <span class="cat-name">Food &amp; drinks</span>
+      <input type="number" id="b-food" placeholder="$0" min="0" step="5" style="width:75px;text-align:right;" value="" oninput="recalcBudget()">
+      <input type="number" id="s-food" placeholder="$0" min="0" step="1" style="width:75px;text-align:right;" value="" oninput="recalcBudget()">
+      <span class="cat-left green" id="left-food">—</span>
+      <button class="btn-icon" onclick="removeCategory(&#39;food&#39;)">✕</button>
+    </div>
+    <div class="bar-wrap" style="margin-bottom:8px;"><div class="bar bar-green" id="bar-food" style="width:0%"></div></div>
+  
+    <div class="cat-row">
+      <span class="cat-name">Fun &amp; entertainment</span>
+      <input type="number" id="b-fun" placeholder="$0" min="0" step="5" style="width:75px;text-align:right;" value="" oninput="recalcBudget()">
+      <input type="number" id="s-fun" placeholder="$0" min="0" step="1" style="width:75px;text-align:right;" value="" oninput="recalcBudget()">
+      <span class="cat-left green" id="left-fun">—</span>
+      <button class="btn-icon" onclick="removeCategory(&#39;fun&#39;)">✕</button>
+    </div>
+    <div class="bar-wrap" style="margin-bottom:8px;"><div class="bar bar-green" id="bar-fun" style="width:0%"></div></div>
+  
+    <div class="cat-row">
+      <span class="cat-name">Games &amp; apps</span>
+      <input type="number" id="b-games" placeholder="$0" min="0" step="5" style="width:75px;text-align:right;" value="" oninput="recalcBudget()">
+      <input type="number" id="s-games" placeholder="$0" min="0" step="1" style="width:75px;text-align:right;" value="" oninput="recalcBudget()">
+      <span class="cat-left green" id="left-games">—</span>
+      <button class="btn-icon" onclick="removeCategory(&#39;games&#39;)">✕</button>
+    </div>
+    <div class="bar-wrap" style="margin-bottom:8px;"><div class="bar bar-green" id="bar-games" style="width:0%"></div></div>
+  
+    <div class="cat-row">
+      <span class="cat-name">Clothes</span>
+      <input type="number" id="b-clothes" placeholder="$0" min="0" step="5" style="width:75px;text-align:right;" value="" oninput="recalcBudget()">
+      <input type="number" id="s-clothes" placeholder="$0" min="0" step="1" style="width:75px;text-align:right;" value="" oninput="recalcBudget()">
+      <span class="cat-left green" id="left-clothes">—</span>
+      <button class="btn-icon" onclick="removeCategory(&#39;clothes&#39;)">✕</button>
+    </div>
+    <div class="bar-wrap" style="margin-bottom:8px;"><div class="bar bar-green" id="bar-clothes" style="width:0%"></div></div>
+  
+    <div class="cat-row">
+      <span class="cat-name">Gas</span>
+      <input type="number" id="b-gas" placeholder="$0" min="0" step="5" style="width:75px;text-align:right;" value="" oninput="recalcBudget()">
+      <input type="number" id="s-gas" placeholder="$0" min="0" step="1" style="width:75px;text-align:right;" value="" oninput="recalcBudget()">
+      <span class="cat-left green" id="left-gas">—</span>
+      <button class="btn-icon" onclick="removeCategory(&#39;gas&#39;)">✕</button>
+    </div>
+    <div class="bar-wrap" style="margin-bottom:8px;"><div class="bar bar-green" id="bar-gas" style="width:0%"></div></div>
+  
+    <div class="cat-row">
+      <span class="cat-name">Misc</span>
+      <input type="number" id="b-misc" placeholder="$0" min="0" step="5" style="width:75px;text-align:right;" value="" oninput="recalcBudget()">
+      <input type="number" id="s-misc" placeholder="$0" min="0" step="1" style="width:75px;text-align:right;" value="" oninput="recalcBudget()">
+      <span class="cat-left green" id="left-misc">—</span>
+      <button class="btn-icon" onclick="removeCategory(&#39;misc&#39;)">✕</button>
+    </div>
+    <div class="bar-wrap" style="margin-bottom:8px;"><div class="bar bar-green" id="bar-misc" style="width:0%"></div></div>
+  </div>
+      <div class="cat-total-row">
+        <span>Total</span>
+        <span id="tot-budget" style="text-align:right">$0</span>
+        <span id="tot-spent" style="text-align:right">$0</span>
+        <span id="tot-left" style="text-align: right; color: var(--green);">$0</span>
+        <span></span>
+      </div>
+      <div class="add-cat-row">
+        <input type="text" id="new-cat" placeholder="New category name…" style="flex:1;">
+        <button class="btn" onclick="addCategory()">+ Add</button>
+      </div>
+    </div>
+    <div class="metric-grid">
+      <div class="metric"><div class="metric-label">Budget set</div><div class="metric-value" id="mb-budget">$0.00</div></div>
+      <div class="metric"><div class="metric-label">Spent so far</div><div class="metric-value" id="mb-spent">$0.00</div></div>
+      <div class="metric"><div class="metric-label">Remaining</div><div class="metric-value green" id="mb-left">$0.00</div></div>
+      <div class="metric"><div class="metric-label">% used</div><div class="metric-value " id="mb-pct">0%</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">Budget used</div>
+    <div class="bar-wrap"><div class="bar bar-green" id="budget-bar" style="width:0%"></div></div>
+    <div class="bar-meta"><span id="budget-bar-pct">0% used</span><span id="budget-bar-note"></span></div>
+    <button class="btn-primary" onclick="saveBudget()">Save budget</button>
+  </div>
+
+  <!-- EARNINGS -->
+  <div id="sec-earn" class="section">
+    <div class="week-nav">
+      <button onclick="changeWeek(-1)">‹</button>
+      <span class="week-label" id="wl-e">Week of Jun 28</span>
+      <button onclick="changeWeek(1)">›</button>
+    </div>
+    <div class="alert alert-floor" id="floor-alert">⚠️ Spending share is under $100 — extra goes to Reserve.</div>
+    <div class="alert alert-cap" id="cap-alert">✅ Reserve hit $150 cap — overflow goes straight to savings!</div>
+    <div class="metric-grid">
+      <div class="metric"><div class="metric-label">Total earned</div><div class="metric-value" id="me-total">$0.00</div></div>
+      <div class="metric"><div class="metric-label">To savings</div><div class="metric-value green" id="me-savings">$0.00</div></div>
+      <div class="metric"><div class="metric-label">Spending</div><div class="metric-value" id="me-spending">$0.00</div></div>
+      <div class="metric"><div class="metric-label">Reserve</div><div class="metric-value amber" id="me-reserve">$0.00</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">Savings this week</div>
+    <div class="bar-wrap"><div class="bar bar-green" id="save-bar" style="width:0%"></div></div>
+    <div class="bar-meta"><span id="save-bar-pct">0% of earnings</span><span id="save-bar-amt"></span></div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">Reserve balance</div>
+    <div class="bar-wrap"><div class="bar bar-amber" id="res-bar" style="width:0%"></div></div>
+    <div class="bar-meta"><span id="res-label">$0.00 of $150</span><span id="res-overflow" style="color:var(--green);"></span></div>
+    <div class="card">
+      <div class="section-title">Earnings by bucket</div>
+      <div class="input-row">
+        <span class="input-label"><span class="badge badge-oriole">Oriole</span></span>
+        <input type="number" id="earn-oriole" placeholder="$0" min="0" oninput="recalcEarn()">
+      </div>
+      <div class="input-row">
+        <span class="input-label"><span class="badge badge-own">Own customers</span></span>
+        <input type="number" id="earn-own" placeholder="$0" min="0" oninput="recalcEarn()">
+      </div>
+      <div class="input-row" style="margin-bottom:0;">
+        <span class="input-label"><span class="badge badge-other">Other</span></span>
+        <input type="number" id="earn-other" placeholder="$0" min="0" oninput="recalcEarn()">
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Savings split</div>
+      <div class="slider-row">
+        <label>Save</label>
+        <input type="range" min="0" max="100" step="5" value="50" id="save-pct" oninput="recalcEarn()">
+        <span class="slider-val" id="save-pct-val">50%</span>
+      </div>
+      <p class="hint">$100 spending floor · $150 Reserve cap (overflow → savings)</p>
+    </div>
+    <div class="card">
+      <div class="section-title">Customers paid this week</div>
+      <div id="week-custs"></div>
+      <p class="empty" id="no-custs-note" style="display: block;">Add customers in the Customers tab first.</p>
+    </div>
+    <button class="btn-primary" onclick="saveEarnings()">Save earnings</button>
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div id="sec-custs" class="section">
+    <div class="card">
+      <div class="section-title">Add a customer</div>
+      <div class="input-row" style="margin-bottom:10px;">
+        <input type="text" id="new-cust-name" placeholder="Customer name" style="flex:1;">
+      </div>
+      <div class="input-row" style="margin-bottom:0;">
+        <select id="new-cust-type" style="flex:1;">
+          <option value="own">Own customer</option>
+          <option value="oriole">Oriole</option>
+          <option value="other">Other</option>
+        </select>
+        <button class="btn" onclick="addCustomer()">+ Add</button>
+      </div>
+    </div>
+    <div id="cust-list"><div class="card"><p class="empty">No customers yet. Add one above.</p></div></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="sec-hist" class="section">
+    <div class="metric-grid">
+      <div class="metric"><div class="metric-label">All-time saved</div><div class="metric-value green" id="hh-saved">$0</div></div>
+      <div class="metric"><div class="metric-label">All-time earned</div><div class="metric-value" id="hh-earned">$0</div></div>
+      <div class="metric"><div class="metric-label">Reserve balance</div><div class="metric-value amber" id="hh-reserve">$0</div></div>
+      <div class="metric"><div class="metric-label">Weeks tracked</div><div class="metric-value" id="hh-weeks">0</div></div>
+    </div>
+    <div class="card">
+      <div class="section-title">Weekly history</div>
+      <div id="hist-list"></div>
+    </div>
+    <div class="card">
+      <div class="section-title">Jobs by customer</div>
+      <div id="hist-custs"></div>
+    </div>
+  </div>
+
+</div>
+
+<nav>
+  <button id="nav-budget" class="active" onclick="showSection(&#39;budget&#39;)"><span class="nav-icon">🎯</span>Budget</button>
+  <button id="nav-earn" onclick="showSection(&#39;earn&#39;)"><span class="nav-icon">💵</span>Earnings</button>
+  <button id="nav-custs" onclick="showSection(&#39;custs&#39;)"><span class="nav-icon">👥</span>Customers</button>
+  <button id="nav-hist" onclick="showSection(&#39;hist&#39;)"><span class="nav-icon">📊</span>History</button>
+</nav>
+
+<script>
+const GIST_ID = '6f2a55981cfd70b87cf3a5b7e496cbed';
+const GIST_FILE = 'carsen-budget.json';
+const PROXY_URL = 'https://carsen-dashboard.netlify.app/.netlify/functions/gist-proxy';
+const PROXY_SECRET = 'wKvHQAl1oESH_ZZVN6JYlytdc3aKn_6l';
+
+const RESERVE_CAP = 150, SPEND_FLOOR = 100;
+const DEFAULT_CATS = [
+  {id:'food',label:'Food & drinks'},{id:'fun',label:'Fun & entertainment'},
+  {id:'games',label:'Games & apps'},{id:'clothes',label:'Clothes'},
+  {id:'gas',label:'Gas'},{id:'misc',label:'Misc'},
+];
+
+let S = { customers:[], weeks:{}, offset:0, reserveBalance:0, categories:JSON.parse(JSON.stringify(DEFAULT_CATS)) };
+let syncTimer = null;
+
+function setSyncStatus(state, msg) {
+  const el = document.getElementById('sync-status');
+  el.textContent = msg;
+  el.className = 'sync-status ' + (state==='ok'?'sync-ok':state==='err'?'sync-err':'sync-ing');
+}
+async function loadFromGist() {
+  setSyncStatus('ing','⟳ Loading…');
+  try {
+    const res = await fetch(PROXY_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({secret:PROXY_SECRET, action:'load', gistId:GIST_ID, file:GIST_FILE})
+    });
+    if (!res.ok) throw new Error('status '+res.status);
+    const data = await res.json();
+    const content = data.content;
+    if (content) {
+      const parsed = JSON.parse(content);
+      if (parsed && typeof parsed==='object') {
+        S = parsed;
+        if (!S.categories||!S.categories.length) S.categories=JSON.parse(JSON.stringify(DEFAULT_CATS));
+        if (!S.customers) S.customers=[];
+        if (!S.weeks) S.weeks={};
+        if (S.offset===undefined) S.offset=0;
+        if (!S.reserveBalance) S.reserveBalance=0;
+      }
+    }
+    setSyncStatus('ok','✓ Synced');
+  } catch(e) {
+    setSyncStatus('err','✗ Offline');
+    try { const raw=localStorage.getItem('carsen_v5'); if(raw) S=JSON.parse(raw); } catch(e2){}
+  }
+  renderAll();
+}
+async function saveToGist() {
+  setSyncStatus('ing','⟳ Saving…');
+  try { localStorage.setItem('carsen_v5',JSON.stringify(S)); } catch(e){}
+  try {
+    const res = await fetch(PROXY_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({secret:PROXY_SECRET, action:'save', gistId:GIST_ID, file:GIST_FILE, data:S})
+    });
+    if (!res.ok) throw new Error('status '+res.status);
+    setSyncStatus('ok','✓ Saved');
+  } catch(e) { setSyncStatus('err','✗ Save failed'); }
+}
+function scheduleSave() { clearTimeout(syncTimer); syncTimer=setTimeout(saveToGist,1500); }
+
+function weekKey(offset) {
+  const d=new Date(); d.setDate(d.getDate()-d.getDay()+(offset*7));
+  return d.toISOString().slice(0,10);
+}
+function weekLabel(offset) {
+  const d=new Date(); d.setDate(d.getDate()-d.getDay()+(offset*7));
+  return 'Week of '+d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+function getCW() {
+  const key=weekKey(S.offset);
+  if (!S.weeks[key]) S.weeks[key]={oriole:0,own:0,other:0,pct:50,customers:{},budget:{},spent:{}};
+  return S.weeks[key];
+}
+function syncInputs() {
+  const w=getCW();
+  w.oriole=parseFloat(document.getElementById('earn-oriole').value)||0;
+  w.own=parseFloat(document.getElementById('earn-own').value)||0;
+  w.other=parseFloat(document.getElementById('earn-other').value)||0;
+  w.pct=parseInt(document.getElementById('save-pct').value);
+  S.categories.forEach(c=>{
+    const bi=document.getElementById('b-'+c.id), si=document.getElementById('s-'+c.id);
+    if(bi) w.budget[c.id]=parseFloat(bi.value)||0;
+    if(si) w.spent[c.id]=parseFloat(si.value)||0;
+  });
+}
+function loadWeekInputs() {
+  const w=getCW(), lbl=weekLabel(S.offset);
+  ['wl-b','wl-e'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=lbl;});
+  document.getElementById('earn-oriole').value=w.oriole||'';
+  document.getElementById('earn-own').value=w.own||'';
+  document.getElementById('earn-other').value=w.other||'';
+  document.getElementById('save-pct').value=w.pct!==undefined?w.pct:50;
+  S.categories.forEach(c=>{
+    const bi=document.getElementById('b-'+c.id), si=document.getElementById('s-'+c.id);
+    if(bi) bi.value=w.budget[c.id]||'';
+    if(si) si.value=w.spent[c.id]||'';
+  });
+}
+function changeWeek(dir) {
+  syncInputs(); S.offset+=dir;
+  loadWeekInputs(); renderWeekCusts(); recalcEarn(); recalcBudget();
+}
+
+function addCategory() {
+  const inp=document.getElementById('new-cat'), name=inp.value.trim();
+  if(!name) return;
+  S.categories.push({id:'c'+Date.now(),label:name}); inp.value='';
+  renderCatRows(); scheduleSave();
+}
+function removeCategory(id) {
+  if(S.categories.length<=1) return;
+  syncInputs(); S.categories=S.categories.filter(c=>c.id!==id);
+  renderCatRows(); scheduleSave();
+}
+function renderCatRows() {
+  const w=getCW();
+  document.getElementById('cat-rows').innerHTML=S.categories.map(c=>`
+    <div class="cat-row">
+      <span class="cat-name">${c.label}</span>
+      <input type="number" id="b-${c.id}" placeholder="$0" min="0" step="5" style="width:75px;text-align:right;" value="${w.budget[c.id]||''}" oninput="recalcBudget()" />
+      <input type="number" id="s-${c.id}" placeholder="$0" min="0" step="1" style="width:75px;text-align:right;" value="${w.spent[c.id]||''}" oninput="recalcBudget()" />
+      <span class="cat-left green" id="left-${c.id}">—</span>
+      <button class="btn-icon" onclick="removeCategory('${c.id}')">✕</button>
+    </div>
+    <div class="bar-wrap" style="margin-bottom:8px;"><div class="bar bar-green" id="bar-${c.id}" style="width:0%"></div></div>
+  `).join('');
+  recalcBudget();
+}
+function recalcBudget() {
+  let tb=0,ts=0;
+  S.categories.forEach(c=>{
+    const bv=parseFloat(document.getElementById('b-'+c.id)?.value)||0;
+    const sv=parseFloat(document.getElementById('s-'+c.id)?.value)||0;
+    tb+=bv; ts+=sv;
+    const left=bv-sv;
+    const lel=document.getElementById('left-'+c.id), bar=document.getElementById('bar-'+c.id);
+    if(lel){lel.textContent=bv>0?'$'+left.toFixed(0):'—';lel.className='cat-left '+(left<0?'red':left===0&&bv>0?'amber':'green');}
+    if(bar&&bv>0){const p=Math.min(100,Math.round(sv/bv*100));bar.style.width=p+'%';bar.className='bar '+(p>=100?'bar-red':p>=80?'bar-amber':'bar-green');}
+    else if(bar){bar.style.width='0%';bar.className='bar bar-green';}
+  });
+  const left=tb-ts, pct=tb>0?Math.min(110,Math.round(ts/tb*100)):0;
+  document.getElementById('tot-budget').textContent='$'+tb.toFixed(0);
+  document.getElementById('tot-spent').textContent='$'+ts.toFixed(0);
+  document.getElementById('tot-left').textContent='$'+left.toFixed(0);
+  document.getElementById('tot-left').style.color=left<0?'var(--red)':'var(--green)';
+  document.getElementById('mb-budget').textContent='$'+tb.toFixed(2);
+  document.getElementById('mb-spent').textContent='$'+ts.toFixed(2);
+  const mlEl=document.getElementById('mb-left'); mlEl.textContent='$'+left.toFixed(2); mlEl.className='metric-value '+(left<0?'red':'green');
+  document.getElementById('mb-pct').textContent=pct+'%';
+  document.getElementById('mb-pct').className='metric-value '+(pct>=100?'red':pct>=80?'amber':'');
+  const bar=document.getElementById('budget-bar'); bar.style.width=Math.min(100,pct)+'%'; bar.className='bar '+(pct>=100?'bar-red':pct>=80?'bar-amber':'bar-green');
+  document.getElementById('budget-bar-pct').textContent=pct+'% used';
+  document.getElementById('budget-bar-note').textContent=left<0?'Over by $'+Math.abs(left).toFixed(2):left>0?'$'+left.toFixed(2)+' remaining':'';
+}
+function saveBudget() {
+  syncInputs();
+  const w=getCW(); let tb=0,ts=0;
+  S.categories.forEach(c=>{tb+=w.budget[c.id]||0;ts+=w.spent[c.id]||0;});
+  w.savedBudget=tb; w.savedSpent=ts;
+  S.weeks[weekKey(S.offset)]=w;
+  saveToGist(); renderHistory();
+  alert('✅ Budget saved for '+weekLabel(S.offset));
+}
+
+function calcSplit(total,pct,rb) {
+  let savings=Math.round(total*pct/100),spending=total-savings,reserveAdd=0,overflow=0;
+  if(total>0&&spending<SPEND_FLOOR){const def=SPEND_FLOOR-spending;reserveAdd=def;savings=Math.max(0,savings-def);spending=SPEND_FLOOR;}
+  const newRes=rb+reserveAdd;
+  if(newRes>RESERVE_CAP){overflow=newRes-RESERVE_CAP;reserveAdd=RESERVE_CAP-rb;savings+=overflow;}
+  return{savings,spending,reserveAdd,overflow,newReserve:rb+reserveAdd};
+}
+function recalcEarn() {
+  const oriole=parseFloat(document.getElementById('earn-oriole').value)||0;
+  const own=parseFloat(document.getElementById('earn-own').value)||0;
+  const other=parseFloat(document.getElementById('earn-other').value)||0;
+  const pct=parseInt(document.getElementById('save-pct').value);
+  document.getElementById('save-pct-val').textContent=pct+'%';
+  const total=oriole+own+other,rb=S.reserveBalance||0;
+  const{savings,spending,reserveAdd,overflow}=calcSplit(total,pct,rb);
+  document.getElementById('me-total').textContent='$'+total.toFixed(2);
+  document.getElementById('me-savings').textContent='$'+savings.toFixed(2);
+  document.getElementById('me-spending').textContent='$'+spending.toFixed(2);
+  document.getElementById('me-reserve').textContent='$'+(rb+reserveAdd).toFixed(2);
+  const sp=total>0?Math.min(100,Math.round(savings/total*100)):0;
+  document.getElementById('save-bar').style.width=sp+'%';
+  document.getElementById('save-bar-pct').textContent=sp+'% of earnings';
+  document.getElementById('save-bar-amt').textContent=total>0?'$'+savings.toFixed(2)+' to savings':'';
+  const rp=Math.min(100,Math.round((rb+reserveAdd)/RESERVE_CAP*100));
+  document.getElementById('res-bar').style.width=rp+'%';
+  document.getElementById('res-label').textContent='$'+(rb+reserveAdd).toFixed(2)+' of $'+RESERVE_CAP;
+  document.getElementById('res-overflow').textContent=overflow>0?'+$'+overflow.toFixed(2)+' → savings':'';
+  document.getElementById('floor-alert').classList.toggle('show',total>0&&(total-Math.round(total*pct/100))<SPEND_FLOOR);
+  document.getElementById('cap-alert').classList.toggle('show',overflow>0);
+}
+function saveEarnings() {
+  syncInputs();
+  const w=getCW(),total=w.oriole+w.own+w.other,rb=S.reserveBalance||0;
+  const{savings,spending,reserveAdd,overflow,newReserve}=calcSplit(total,w.pct,rb);
+  w.savedSavings=savings;w.savedSpending=spending;w.savedReserveAdd=reserveAdd;
+  w.savedReserveOverflow=overflow;w.savedTotal=total;w.reserveBalanceAfter=newReserve;
+  S.reserveBalance=newReserve;
+  S.weeks[weekKey(S.offset)]=w;
+  saveToGist(); renderHistory();
+  alert('✅ Earnings saved!\nSavings: $'+savings.toFixed(2)+'\nReserve: $'+newReserve.toFixed(2));
+}
+
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function fmtDate(str) {
+  if(!str) return '';
+  const d=new Date(str+'T12:00:00');
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+function addCustomer() {
+  const name=document.getElementById('new-cust-name').value.trim();
+  const type=document.getElementById('new-cust-type').value;
+  if(!name) return;
+  S.customers.push({name,type,id:Date.now(),jobs:[]});
+  document.getElementById('new-cust-name').value='';
+  renderCustList(); renderWeekCusts(); scheduleSave();
+}
+function removeCustomer(id) {
+  if(!confirm('Remove this customer and all their job history?')) return;
+  S.customers=S.customers.filter(c=>c.id!==id);
+  renderCustList(); renderWeekCusts(); scheduleSave();
+}
+function toggleCust(id) {
+  const body=document.getElementById('cbody-'+id);
+  if(body) body.classList.toggle('open');
+}
+function addJob(custId) {
+  const dateEl=document.getElementById('jdate-'+custId);
+  const amtEl=document.getElementById('jamt-'+custId);
+  const noteEl=document.getElementById('jnote-'+custId);
+  const date=dateEl.value||todayStr();
+  const amt=parseFloat(amtEl.value)||0;
+  const note=noteEl.value.trim();
+  if(!amt){alert('Enter an amount for this job.');return;}
+  const cust=S.customers.find(c=>c.id===custId);
+  if(!cust) return;
+  if(!cust.jobs) cust.jobs=[];
+  cust.jobs.unshift({id:Date.now(),date,amt,note});
+  amtEl.value=''; noteEl.value=''; dateEl.value=todayStr();
+  renderCustList(); scheduleSave();
+  setTimeout(()=>{const b=document.getElementById('cbody-'+custId);if(b)b.classList.add('open');},50);
+}
+function removeJob(custId,jobId) {
+  const cust=S.customers.find(c=>c.id===custId);
+  if(!cust) return;
+  cust.jobs=cust.jobs.filter(j=>j.id!==jobId);
+  renderCustList(); scheduleSave();
+  setTimeout(()=>{const b=document.getElementById('cbody-'+custId);if(b)b.classList.add('open');},50);
+}
+function custInitials(name) {
+  return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+function renderCustList() {
+  const el=document.getElementById('cust-list');
+  if(!S.customers.length){el.innerHTML='<div class="card"><p class="empty">No customers yet. Add one above.</p></div>';return;}
+  el.innerHTML=S.customers.map(c=>{
+    const jobs=c.jobs||[];
+    const total=jobs.reduce((s,j)=>s+j.amt,0);
+    const avatarClass='avatar-'+(c.type==='oriole'?'oriole':c.type==='own'?'own':'other');
+    const badgeClass='badge-'+(c.type==='oriole'?'oriole':c.type==='own'?'own':'other');
+    const badgeLabel=c.type==='own'?'Own':c.type==='oriole'?'Oriole':'Other';
+    const jobRows=jobs.length?jobs.map(j=>`
+      <div class="job-row">
+        <span class="job-date">${fmtDate(j.date)}</span>
+        <span class="job-note">${j.note||'—'}</span>
+        <span class="job-amt">$${j.amt.toFixed(2)}</span>
+        <button class="btn-icon" onclick="removeJob(${c.id},${j.id})" style="font-size:13px;">✕</button>
+      </div>`).join(''):'<p class="empty">No jobs logged yet.</p>';
+    return `
+    <div class="cust-card">
+      <div class="cust-card-header" onclick="toggleCust(${c.id})">
+        <div class="cust-avatar ${avatarClass}">${custInitials(c.name)}</div>
+        <div class="cust-info">
+          <div class="cust-name">${c.name} <span class="badge ${badgeClass}" style="margin-left:4px;">${badgeLabel}</span></div>
+          <div class="cust-meta">${jobs.length} job${jobs.length!==1?'s':''} · $${total.toFixed(2)} total</div>
+        </div>
+        <span style="color:var(--text3);font-size:18px;">›</span>
+      </div>
+      <div class="cust-body" id="cbody-${c.id}">
+        <div class="section-title" style="margin-bottom:8px;">Job history</div>
+        ${jobRows}
+        <div class="add-job-form" style="margin-top:10px;">
+          <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">Log a job</div>
+          <div class="form-row">
+            <input type="date" id="jdate-${c.id}" value="${todayStr()}" style="flex:1;" />
+            <input type="number" id="jamt-${c.id}" placeholder="Amount $" min="0" step="5" style="flex:1;" />
+          </div>
+          <div class="form-row">
+            <input type="text" id="jnote-${c.id}" placeholder="Note (e.g. mowing, edging…)" style="flex:1;" />
+            <button class="btn btn-sm" onclick="addJob(${c.id})" style="white-space:nowrap;">+ Log</button>
+          </div>
+        </div>
+        <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);text-align:right;">
+          <button class="btn-icon" onclick="removeCustomer(${c.id})" style="font-size:12px;color:var(--red);">🗑 Remove customer</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderWeekCusts() {
+  const w=getCW();
+  const el=document.getElementById('week-custs');
+  const note=document.getElementById('no-custs-note');
+  if(!S.customers.length){el.innerHTML='';note.style.display='block';return;}
+  note.style.display='none';
+  if(!w.customers) w.customers={};
+  el.innerHTML=S.customers.map(c=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <span style="flex:1;font-size:13px;">${c.name}
+        <span class="badge badge-${c.type==='oriole'?'oriole':c.type==='own'?'own':'other'}" style="margin-left:4px;">${c.type==='own'?'Own':c.type==='oriole'?'Oriole':'Other'}</span>
+      </span>
+      <input type="number" placeholder="$0" min="0" step="5" style="width:85px;" value="${w.customers[c.id]||''}" oninput="updateCustPay(${c.id},this.value)" />
+    </div>`).join('');
+}
+function updateCustPay(id,val) {
+  const w=getCW(); if(!w.customers) w.customers={};
+  w.customers[id]=parseFloat(val)||0;
+  const byType=(type)=>S.customers.filter(c=>c.type===type).reduce((s,c)=>s+(w.customers[c.id]||0),0);
+  document.getElementById('earn-own').value=byType('own')||'';
+  document.getElementById('earn-oriole').value=byType('oriole')||'';
+  document.getElementById('earn-other').value=byType('other')||'';
+  recalcEarn();
+}
+
+function renderHistory() {
+  const keys=Object.keys(S.weeks).filter(k=>S.weeks[k].savedTotal!==undefined||S.weeks[k].savedBudget!==undefined).sort().reverse();
+  let ts=0,te=0;
+  keys.forEach(k=>{ts+=S.weeks[k].savedSavings||0;te+=S.weeks[k].savedTotal||0;});
+  document.getElementById('hh-saved').textContent='$'+ts.toFixed(2);
+  document.getElementById('hh-earned').textContent='$'+te.toFixed(2);
+  document.getElementById('hh-reserve').textContent='$'+(S.reserveBalance||0).toFixed(2);
+  document.getElementById('hh-weeks').textContent=keys.length;
+  const el=document.getElementById('hist-list');
+  if(!keys.length){el.innerHTML='<p class="empty">No saved weeks yet.</p>';}
+  else{
+    el.innerHTML=keys.map(k=>{
+      const w=S.weeks[k];
+      const d=new Date(k+'T12:00:00');
+      const lbl=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      const bNote=w.savedBudget!==undefined?`<span style="font-size:11px;color:var(--text2);">Budget $${w.savedBudget.toFixed(0)} · Spent $${(w.savedSpent||0).toFixed(0)}</span>`:'';
+      const eNote=w.savedTotal!==undefined?`<span style="color:var(--green);font-weight:600;font-size:13px;">Saved $${(w.savedSavings||0).toFixed(2)}</span>`:'';
+      return `<div class="hist-row"><span style="min-width:52px;font-weight:600;">${lbl}</span><div style="flex:1;">${bNote}</div>${eNote}</div>`;
+    }).join('');
+  }
+  const hcEl=document.getElementById('hist-custs');
+  if(!S.customers.length){hcEl.innerHTML='<p class="empty">No customers yet.</p>';return;}
+  hcEl.innerHTML=S.customers.map(c=>{
+    const jobs=(c.jobs||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+    const total=jobs.reduce((s,j)=>s+j.amt,0);
+    const badgeClass='badge-'+(c.type==='oriole'?'oriole':c.type==='own'?'own':'other');
+    const badgeLabel=c.type==='own'?'Own':c.type==='oriole'?'Oriole':'Other';
+    const rows=jobs.length?jobs.map(j=>`
+      <div class="cust-hist-row">
+        <span style="color:var(--text2);min-width:60px;font-size:12px;">${fmtDate(j.date)}</span>
+        <span style="flex:1;font-size:13px;">${j.note||'—'}</span>
+        <span style="color:var(--green);font-weight:600;">$${j.amt.toFixed(2)}</span>
+      </div>`).join(''):'<p class="empty" style="padding:6px 0;">No jobs logged.</p>';
+    return `
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:14px;font-weight:600;">${c.name} <span class="badge ${badgeClass}" style="margin-left:4px;">${badgeLabel}</span></span>
+          <span style="font-size:13px;font-weight:600;color:var(--green);">$${total.toFixed(2)}</span>
+        </div>
+        ${rows}
+      </div>`;
+  }).join('<div class="divider"></div>');
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  if(id==='hist') renderHistory();
+}
+
+function renderAll() {
+  renderCatRows(); loadWeekInputs();
+  renderCustList(); renderWeekCusts();
+  recalcEarn(); recalcBudget();
+}
+
+loadFromGist();
+</script>
+
+
+
+</body></html>
