@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/hatch/Downloads/carsen-index_1.html -->
+<!-- saved from url=(0052)file:///C:/Users/hatch/Downloads/carsen-index_2.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -381,11 +381,14 @@ async function loadFromGist() {
     setSyncStatus('err','✗ Offline');
     try { const raw=localStorage.getItem('carsen_v5'); if(raw) S=JSON.parse(raw); } catch(e2){}
   }
+  initialLoadComplete = true;
   renderAll();
 }
+let initialLoadComplete = false;
 async function saveToGist() {
-  setSyncStatus('ing','⟳ Saving…');
   try { localStorage.setItem('carsen_v5',JSON.stringify(S)); } catch(e){}
+  if (!initialLoadComplete) return; // don't overwrite cloud data before we've actually loaded it
+  setSyncStatus('ing','⟳ Saving…');
   try {
     const res = await fetch(PROXY_URL, {
       method:'POST',
